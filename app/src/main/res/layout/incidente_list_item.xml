@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="#fff"
+    android:foreground="?selectableItemBackground"
+    android:clickable="true"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:outlineProvider="bounds"
+    android:paddingEnd="16dp"
+    android:paddingStart="16dp"
+    android:stateListAnimator="@animator/raise">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/label_list_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_folio" />
+
+            <TextView
+                style="@style/label_list_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_estatus" />
+
+            <TextView
+                style="@style/label_list_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Técnico" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_folio"
+                style="@style/value_list_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="0322" />
+
+            <TextView
+                android:id="@+id/tv_estatus"
+                style="@style/value_list_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="En proceso" />
+
+            <TextView
+                android:id="@+id/tv_asignado"
+                style="@style/value_list_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Oscar Méndez Hernández" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:orientation="vertical"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/tv_fecha"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:textSize="8sp"
+                tools:text="27/03/2017" />
+
+            <TextView
+                android:id="@+id/tv_hora"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="end"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                android:textSize="8sp"
+                tools:text="05:00 PM" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="end"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/tv_prioridad"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@drawable/prioridad_alta" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

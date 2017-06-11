@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Service Desk CUCSH</string>
+    <string name="title_activity_loggin">loggin</string>
+    <string name="navigation_drawer_open">Abierto</string>
+    <string name="navigation_drawer_close">Cerrado</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string-array name="array_areas">
+        <item>Redes y Telefonía</item>
+        <item>Taller de cómputo</item>
+        <item>Multimedia</item>
+        <item>Administrativa</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_tabs">TABS</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="label_folio">Folio:</string>
+    <string name="label_asignado">Asignado:</string>
+    <string name="label_estatus">Estatus:</string>
+    <string name="title_activity_formulario">Formulario</string>
+</resources>

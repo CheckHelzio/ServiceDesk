@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/super_contenedor_portada"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#424242"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_main"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="@drawable/header2"
+        android:elevation="8dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="12dp"
+                android:scaleType="fitStart"
+                app:srcCompat="@drawable/ic_logo_cta" />
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorAccent"
+        android:elevation="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="32dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_usuario"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:textColorHint="#fff"
+            android:layout_gravity="center_horizontal"
+            app:hintTextAppearance="@style/hint_loggin">
+
+            <EditText
+                android:id="@+id/et_usuario"
+                android:layout_width="400dp"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:hint="Usuario:"
+                android:textColorHint="#fff"
+                android:imeOptions="actionNext"
+                android:inputType="number"
+                android:maxLength="9"
+                android:textColor="#fff"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_contraseña"
+            android:layout_width="400dp"
+            android:textColorHint="#fff"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="4"
+            app:hintTextAppearance="@style/hint_loggin">
+
+            <EditText
+                android:id="@+id/et_contraseña"
+                android:layout_width="400dp"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:hint="Contraseña:"
+                android:imeOptions="actionDone"
+                android:inputType="numberPassword"
+                android:maxLength="4"
+                android:textColor="#fff"
+                android:textColorHint="#fff"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/bt_iniciar_sesion"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="32dp"
+            android:background="#00000000"
+            android:text="Iniciar sesión"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>

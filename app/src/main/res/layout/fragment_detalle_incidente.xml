@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinador"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:elevation="8dp">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar_detalle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#8E171A"
+        android:fitsSystemWindows="true">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/main.collapsing"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="#00000000">
+
+            <RelativeLayout
+                android:id="@+id/conte_folio"
+                android:layout_width="match_parent"
+                android:layout_height="128dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:visibility="invisible"
+                    android:id="@+id/reveal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tv_folio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center"
+                        android:text="Folio 2845"
+                        android:textColor="#fff"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_tecnico"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:textColor="#fff"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/iv_delete"
+                    style="@style/RippleBlanco"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentEnd="true"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:onClick="eliminar"
+                    android:paddingLeft="18dp"
+                    android:paddingRight="18dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_delete"
+                    android:tint="#fff" />
+            </RelativeLayout>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <View
+                android:id="@+id/separador1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="#3c000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/separador1"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_cerrar_sesion" />
+
+                    <TextView
+                        android:id="@+id/label_nombre"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="12dp"
+                        android:background="#00000000"
+                        android:maxLines="1"
+                        android:paddingEnd="56dp"
+                        android:paddingStart="72dp"
+                        android:text="Nombre:"
+                        android:textColor="#121212"
+                        android:textSize="10sp" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_nombre"
+                        android:layout_marginTop="-4dp"
+                        android:layout_below="@+id/label_nombre"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:layout_marginEnd="56dp"
+                        android:layout_marginStart="72dp"
+                        android:textColor="#121212"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_edificio" />
+
+                    <TextView
+                        android:id="@+id/label_dependencia"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="12dp"
+                        android:background="#00000000"
+                        android:maxLines="1"
+                        android:paddingEnd="56dp"
+                        android:paddingStart="72dp"
+                        android:text="Dependencia:"
+                        android:textColor="#121212"
+                        android:textSize="10sp" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_dependencia"
+                        android:layout_marginTop="-4dp"
+                        android:layout_below="@+id/label_dependencia"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:layout_marginEnd="56dp"
+                        android:layout_marginStart="72dp"
+                        android:textColor="#121212"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_location" />
+
+                    <TextView
+                        android:id="@+id/label_ubicacion"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="12dp"
+                        android:background="#00000000"
+                        android:maxLines="1"
+                        android:paddingEnd="56dp"
+                        android:paddingStart="72dp"
+                        android:text="Ubicacion:"
+                        android:textColor="#121212"
+                        android:textSize="10sp" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_ubicacion"
+                        android:layout_marginTop="-4dp"
+                        android:layout_below="@+id/label_ubicacion"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:layout_marginEnd="56dp"
+                        android:layout_marginStart="72dp"
+                        android:textColor="#121212"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:scaleType="centerCrop"
+                        android:tint="#000"
+                        android:src="@drawable/ic_phone" />
+
+                    <TextView
+                        android:id="@+id/label_telefono"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="12dp"
+                        android:background="#00000000"
+                        android:maxLines="1"
+                        android:paddingEnd="56dp"
+                        android:paddingStart="72dp"
+                        android:text="Teléfono:"
+                        android:textColor="#121212"
+                        android:textSize="10sp" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_telefono"
+                        android:layout_marginTop="-4dp"
+                        android:layout_below="@+id/label_telefono"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:layout_marginEnd="56dp"
+                        android:layout_marginStart="72dp"
+                        android:textColor="#121212"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:scaleType="centerCrop"
+                        android:tint="#000"
+                        android:src="@drawable/ic_mail" />
+
+                    <TextView
+                        android:id="@+id/label_correo"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="12dp"
+                        android:background="#00000000"
+                        android:maxLines="1"
+                        android:paddingEnd="56dp"
+                        android:paddingStart="72dp"
+                        android:text="Correo:"
+                        android:textColor="#121212"
+                        android:textSize="10sp" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_correo"
+                        android:layout_marginTop="-4dp"
+                        android:layout_below="@+id/label_correo"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:layout_marginEnd="56dp"
+                        android:layout_marginStart="72dp"
+                        android:textColor="#121212"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#3c000000" />
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_incidente" />
+
+                    <TextView
+                        android:id="@+id/label_incidente"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="12dp"
+                        android:background="#00000000"
+                        android:maxLines="1"
+                        android:paddingEnd="56dp"
+                        android:paddingStart="72dp"
+                        android:text="Incidente:"
+                        android:textColor="#121212"
+                        android:textSize="10sp" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_incidente"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/label_incidente"
+                        android:layout_marginTop="-4dp"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:layout_marginEnd="56dp"
+                        android:layout_marginStart="72dp"
+                        android:textColor="#121212"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#3c000000" />
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_info" />
+
+                    <TextView
+                        android:id="@+id/label"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="12dp"
+                        android:background="#00000000"
+                        android:maxLines="1"
+                        android:paddingEnd="56dp"
+                        android:paddingStart="72dp"
+                        android:text="Descripción:"
+                        android:textColor="#121212"
+                        android:textSize="10sp" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_descripcion"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/label"
+                        android:layout_marginTop="-4dp"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:layout_marginEnd="56dp"
+                        android:layout_marginStart="72dp"
+                        android:textColor="#121212"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#3c000000" />
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:scaleType="centerCrop"
+                        android:tint="#000"
+                        android:src="@drawable/ic_progress" />
+
+                    <TextView
+                        android:id="@+id/label_progreso"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="12dp"
+                        android:background="#00000000"
+                        android:maxLines="1"
+                        android:paddingEnd="56dp"
+                        android:paddingStart="72dp"
+                        android:text="Progreso:"
+                        android:textColor="#121212"
+                        android:textSize="10sp" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_progreso"
+                        android:layout_marginTop="-4dp"
+                        android:layout_below="@+id/label_progreso"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:layout_marginEnd="56dp"
+                        android:layout_marginStart="72dp"
+                        android:textColor="#121212"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:id="@+id/conte_extra"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_text" />
+
+                    <TextView
+                        android:id="@+id/tv_label_mensaje_tecnico"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="12dp"
+                        android:background="#00000000"
+                        android:maxLines="1"
+                        android:paddingEnd="56dp"
+                        android:paddingStart="72dp"
+                        android:text="Descripción:"
+                        android:textColor="#121212"
+                        android:textSize="10sp" />
+
+                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                        android:id="@+id/tv_mensaje_tecnico"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tv_label_mensaje_tecnico"
+                        android:layout_marginTop="-4dp"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:layout_marginEnd="56dp"
+                        android:layout_marginStart="72dp"
+                        android:textColor="#121212"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:onClick="editar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_edit"
+        app:layout_anchor="@id/appbar_detalle"
+        app:layout_anchorGravity="bottom|end" />
+
+</android.support.design.widget.CoordinatorLayout>

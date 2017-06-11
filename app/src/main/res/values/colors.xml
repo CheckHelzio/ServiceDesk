@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#313439</color>
+    <color name="colorPrimaryDark">#313439</color>
+    <color name="colorAccent">#CC6633</color>
+    <color name="colorDeTextos">#4f4f51</color>
+    <color name="transparente">#00000000</color>
+    <color name="colorRectoria">#469aac</color>
+    <color name="colorBuscar">#469aac</color>
+    <color name="colorHistoricosHumanos">#215192</color>
+    <color name="colorEstudiosCultura">#38317e</color>
+    <color name="colorEstudiosJuridicos">#338976</color>
+    <color name="colorCatedras">#7d173d</color>
+    <color name="colorPoliticosSociales">#741e1f</color>
+    <color name="colorEstadoSociedad">#88441d</color>
+</resources>

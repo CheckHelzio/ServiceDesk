@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#fff"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:id="@+id/tv_nombre"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical"
+            android:textColor="#121212"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="Doctor Héctor Raúl Solís Gadea" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_puesto" />
+
+        <TextView
+            android:id="@+id/label_puesto"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#00000000"
+            android:maxLines="1"
+            android:paddingEnd="56dp"
+            android:paddingStart="72dp"
+            android:text="Puesto:"
+            android:textColor="#121212"
+            android:textStyle="bold"
+            android:textSize="8sp" />
+
+        <TextView
+            android:id="@+id/tv_puesto"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/label_puesto"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="-2dp"
+            android:background="#00000000"
+            android:gravity="top"
+            android:textColor="#121212"
+            android:textSize="12sp"
+            tools:text="Rector" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_location" />
+
+        <TextView
+            android:id="@+id/label_direccion"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#00000000"
+            android:maxLines="1"
+            android:paddingEnd="56dp"
+            android:paddingStart="72dp"
+            android:text="Dirección:"
+            android:textColor="#121212"
+            android:textStyle="bold"
+            android:textSize="8sp" />
+
+        <TextView
+            android:id="@+id/tv_direccion"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/label_direccion"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="-2dp"
+            android:background="#00000000"
+            android:gravity="top"
+            android:layout_marginBottom="8dp"
+            android:textColor="#121212"
+            android:textSize="12sp"
+            tools:text="Guanajuato No. 1045. C.P. 44260. Col. Alcalde Barranquitas" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:foreground="?selectableItemBackground"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:tint="#000"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_phone" />
+
+        <TextView
+            android:id="@+id/label_telefono"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#00000000"
+            android:maxLines="1"
+            android:paddingEnd="56dp"
+            android:paddingStart="72dp"
+            android:text="Teléfono:"
+            android:textColor="#121212"
+            android:textStyle="bold"
+            android:textSize="8sp"/>
+
+        <TextView
+            android:id="@+id/tv_telefono"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/label_telefono"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="-2dp"
+            android:background="#00000000"
+            android:gravity="top"
+            android:textColor="#121212"
+            android:textSize="12sp"
+            android:layout_marginBottom="8dp"
+            tools:text="(01-33) 3819-3320 3819-3300 ext. 23320 y 23437" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_marginBottom="8dp"
+        android:id="@+id/conte_correo"
+        android:foreground="?selectableItemBackground"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_mail" />
+
+        <TextView
+            android:id="@+id/label_correo"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#00000000"
+            android:maxLines="1"
+            android:paddingEnd="56dp"
+            android:paddingStart="72dp"
+            android:text="Correo:"
+            android:textColor="#121212"
+            android:textStyle="bold"
+            android:textSize="8sp"/>
+
+        <TextView
+            android:id="@+id/tv_correo"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/label_correo"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="-2dp"
+            android:background="#00000000"
+            android:gravity="top"
+            android:textColor="#121212"
+            android:textSize="12sp"
+            tools:text="solish@redudg.udg.mx" />
+
+    </RelativeLayout>
+
+</LinearLayout>

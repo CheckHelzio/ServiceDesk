@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <com.pixelcan.inkpageindicator.InkPageIndicator
+            android:id="@+id/indicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:currentPageIndicatorColor="@color/colorAccent"
+            app:pageIndicatorColor="#83000000" />
+
+        <com.hanks.htextview.HTextView
+            android:id="@+id/tv_subtitulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="DATOS PERSONALES"
+            android:textColor="@color/colorDeTextos"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <checkhelzio.ccv.servicedeskcucsh.NoSwipeViewPager
+            android:layout_marginTop="8dp"
+            android:id="@+id/pager"
+            android:background="#fff"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="88.2" />
+
+    </LinearLayout>
+
+</RelativeLayout>

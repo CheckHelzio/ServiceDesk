@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_generar_reportes"
+            android:icon="@drawable/ic_reporte"
+            android:title="Generar reporte" />
+        <item
+            android:id="@+id/nav_lista_reportes"
+            android:icon="@drawable/ic_lista_reportes"
+            android:title="Lista de reportes" />
+    </group>
+
+    <item android:title="Usuarios">
+        <menu>
+            <item
+                android:id="@+id/nav_cerrar_sesion"
+                android:icon="@drawable/ic_cerrar_sesion"
+                android:title="Cerrar sesión" />
+        </menu>
+    </item>
+
+</menu>
