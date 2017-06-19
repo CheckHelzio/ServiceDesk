@@ -19,6 +19,9 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -26,6 +29,7 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -37,19 +41,22 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView;
 
-import static checkhelzio.ccv.servicedeskcucsh.ActivityListaIncidentes.listaIncidente;
+import static checkhelzio.ccv.servicedeskcucsh.ActivityListaIncidentes.listaIncidenteCompleta;
 import static checkhelzio.ccv.servicedeskcucsh.R.id.et_descripcion_del_problema;
 import static checkhelzio.ccv.servicedeskcucsh.R.id.input_descripcion_del_problema;
 
 public class ActivityDetalleIncidente extends AppCompatActivity {
 
     private Incidente incidente;
+    private boolean actualizandoStatus;
     private TextView tv_folio;
     private FadeTextView tv_tecnico, tvNombre, tvDependencia, tvUbicacion, tvTelefono, tvCorreo, tvTipoIncidente, tvDescripcion, tvProgreso, tvMensajeTecnico;
     private String st_lista_incidentes;
@@ -64,9 +71,9 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
     private int nivel_progreso;
     private String mensaje_tecnico = "Sin datos adicionales";
 
-
-    private ArrayList<Incidente> listaIncidentesBackup = new ArrayList<>();
+    private ArrayList<Incidente> listaIncidenteConsultasBackup = new ArrayList<>();
     private boolean wifiConnected;
+    private Tecnico tec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,12 +87,6 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
         incidente = getIntent().getParcelableExtra("INCIDENTE");
         index = getIntent().getIntExtra("INDEX", 0);
         iniciarObjetos();
-        if (ActivityListaIncidentes.tecnico.getCodigoDelTecnico().equals(incidente.getCodigoDelTecnicoAsignado()) &&
-                incidente.getStatusDeTerminacionDelReporte() == 0 && isThereNetworkConnection()) {
-            incidente.setStatusDeTerminacionDelReporte(1);
-            nivel_progreso = 1;
-            new EditarEvento().execute();
-        }
         llenarDatos();
     }
 
@@ -118,6 +119,7 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("SERVICE_DESK_CUCSH_PREFERENCES", Context.MODE_PRIVATE);
         String tecnico = sharedPreferences.getString("TECNICO", "FALSE");
+        tec = new Tecnico(tecnico);
         nivel_usuario = new Tecnico(tecnico).getNivel();
         if (nivel_usuario == 1) {
             findViewById(R.id.iv_delete).setVisibility(View.GONE);
@@ -137,7 +139,9 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
         tvTelefono.setTextoInicial(incidente.getTelefonoDelCliente());
         tvCorreo.setTextoInicial(incidente.getCorreoElectronicoDelCliente());
         tvTipoIncidente.setTextoInicial(crearTextoTipoIncidente(incidente));
-        tvDescripcion.setTextoInicial(incidente.getDescripcionDelReporte());
+        tvDescripcion.setTextoInicial(incidente.getDescripcionDelReporte()
+                .replaceAll("Editado por:", "\n\nEditado por:")
+                .replaceAll("~~", "\n"));
         tvProgreso.setTextoInicial(crearTextoProgreso(incidente.getStatusDeTerminacionDelReporte()));
 
         nivel_progreso = incidente.getStatusDeTerminacionDelReporte();
@@ -156,7 +160,139 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
             }
         });
 
-        listaIncidentesBackup.addAll(listaIncidente);
+        if (incidente.getStatusDeTerminacionDelReporte() == 0 && incidente.getCodigoDelTecnicoAsignado().equals(tec.getCodigoDelTecnico())) {
+            if (isThereNetworkConnection()) {
+                actualizarStatusAsigando();
+            }
+        }
+    }
+
+    private void actualizarStatusAsigando() {
+        new ActualizarEvento().execute();
+        Log.v("ACTUALIZAR", "A:0");
+    }
+
+    private class ActualizarEvento extends AsyncTask<String, String, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.v("ACTUALIZAR", "A:1");
+
+            actualizandoStatus = true;
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy h:mm a", Locale.getDefault());
+
+            Incidente incidenteNuevo = new Incidente(
+                    incidente.getCodigoDelCliente(), // CODIGO DEL CLIENTE
+                    incidente.getNombreDelCliente(), // NOMBRE DEL CLIENTE
+                    incidente.getDependenciaDelCliente(), // DEPENDENCIA DEL CLIENTE
+                    incidente.getUbicacionDelCliente(), // UBICACION DEL CLIENTE
+                    incidente.getTelefonoDelCliente(), // TELEFONO DEL CLIENTE
+                    incidente.getCorreoElectronicoDelCliente(), // CORREO DEL CLIENTE
+
+                    incidente.getAreaDelServicio(), // AREA DEL SERVICIO
+                    incidente.getTipoDeServicio(), // TIPO DEL SERVICIO
+                    incidente.getPrioridadDelServicio(), // PRIPRIDAD DEL SERVICIO
+                    incidente.getDescripcionDelReporte(), // DESCRIPCION DEL SERVICIO
+
+                    incidente.getFechaYHoraDelReporte() + 1, // FECHA Y HORA DEL SERVICIO
+                    1, // STATUS DE TERMINACION DEL SERVICIO
+                    incidente.getFolioDelReporte(), // FOLIO DEL SERVICIO
+
+                    incidente.getCodigoDelTecnicoAsignado(), // CODIGO DEL TECNICO ASIGNADO
+                    tec.getCodigoDelTecnico(), // CODIGO DE QUIEN LEVANTO EL REPORTE
+                    incidente.getStatusDeModificacionDelReporte(), // STATUS DE MODIFICACION DEL SERVICIO
+                    "", // TAG DEL REPORTE
+                    "Visto por el técnico - " + format.format(Calendar.getInstance().getTime())
+            );
+            incidenteNuevo.setTagDelReporte(incidenteNuevo.aTag());
+            Log.v("ACTUALIZAR", "A: " + incidenteNuevo.aTag());
+            Log.v("ACTUALIZAR", "B: " + incidente.aTag());
+
+            listaIncidenteConsultasBackup.clear();
+            listaIncidenteConsultasBackup.addAll(listaIncidenteCompleta);
+
+            int x = 0;
+            for (Incidente in : listaIncidenteConsultasBackup) {
+                if (in.getFolioDelReporte() == incidente.getFolioDelReporte()) {
+                    listaIncidenteConsultasBackup.remove(x);
+                    break;
+                }
+                x++;
+            }
+            listaIncidenteConsultasBackup.add(0, incidenteNuevo);
+
+            Collections.sort(listaIncidenteConsultasBackup, new Comparator<Incidente>() {
+                @Override
+                public int compare(Incidente o1, Incidente o2) {
+                    return Long.valueOf(o1.getFechaYHoraDelReporte()).compareTo(o2.getFechaYHoraDelReporte());
+                }
+            });
+
+            st_lista_incidentes = "";
+            for (Incidente item : listaIncidenteConsultasBackup) {
+                st_lista_incidentes += item.aTag() + "¦";
+            }
+
+            data = "";
+            registroCorrecto = false;
+        }
+
+        @Override
+        protected Void doInBackground(String... aa12) {
+            try {
+                URL url = new URL("http://148.202.6.72/aplicacion/incidentes.php");
+                HttpURLConnection aaaaa = (HttpURLConnection) url.openConnection();
+                aaaaa.setReadTimeout(0);
+                aaaaa.setConnectTimeout(0);
+                aaaaa.setRequestMethod("POST");
+                aaaaa.setDoInput(true);
+                aaaaa.setDoOutput(true);
+
+                Uri.Builder builder = new Uri.Builder()
+                        .appendQueryParameter("incidentes", st_lista_incidentes);
+                String query = builder.build().getEncodedQuery();
+
+                OutputStream os = aaaaa.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(os, "UTF-8"));
+                writer.write(query);
+                writer.flush();
+                writer.close();
+                os.close();
+
+                aaaaa.connect();
+
+                int aaaaaaa = aaaaa.getResponseCode();
+                if (aaaaaaa == HttpsURLConnection.HTTP_OK) {
+                    registroCorrecto = true;
+                    String aaaaaaaa;
+                    BufferedReader br = new BufferedReader(new InputStreamReader(aaaaa.getInputStream(), "UTF-8"));
+                    while ((aaaaaaaa = br.readLine()) != null) {
+                        data += aaaaaaaa;
+                    }
+                } else {
+                    data = "error code: " + aaaaaaa;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (data.contains("error code: ") || !registroCorrecto) {
+                Toast.makeText(ActivityDetalleIncidente.this, "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet.", Toast.LENGTH_LONG).show();
+            } else {
+                SharedPreferences prefs = getSharedPreferences("SERVICE_DESK_CUCSH_PREFERENCES", Context.MODE_PRIVATE);
+                prefs.edit().putString("LISTA_DE_INCIDENTES", st_lista_incidentes).apply();
+
+                isEditanto = true;
+                new GuardarUpdate().execute();
+            }
+        }
     }
 
     private void cambiarLabelMensajeTecnico() {
@@ -381,19 +517,15 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
                         if (validarItems(input_descripcion, et_descripcion)) {
+                            isEditanto = true;
                             new EditarEvento().execute();
                         }
                     }
 
                     private boolean validarItems(TextInputLayout input_descripcion, EditText et_descripcion) {
                         boolean isValid = true;
-                        if (et_descripcion.length() == 0) {
-                            input_descripcion.setError("Introduce la descripción del incidente.");
-                            isValid = false;
-                        } else {
-                            input_descripcion.setError(null);
-                            mensaje_tecnico = et_descripcion.getText().toString();
-                        }
+                        input_descripcion.setError(null);
+                        mensaje_tecnico = et_descripcion.getText().toString();
                         return isValid;
                     }
                 });
@@ -404,13 +536,37 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
         alertDialogBuilder.setCancelable(false);
         AlertDialog dialog = alertDialogBuilder.create();
         dialog.show();
+        ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE)
+                .setEnabled(false);
+        input_descripcion.setError("Introduce un comentario para continuar");
+        et_descripcion.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (TextUtils.isEmpty(s)) {
+                    // Disable ok button
+                    ((AlertDialog) dialog).getButton(
+                            AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                } else {
+                    // Something into edit text. Enable the button.
+                    ((AlertDialog) dialog).getButton(
+                            AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                }
+            }
+        });
     }
 
     public void confirmarEventoEliminado() {
-        Intent intent = getIntent();
-        intent.putExtra("INDEX", intent.getIntExtra("INDEX", 0));
-        intent.putExtra("EDITANDO", false);
-        setResult(RESULT_OK, intent);
+        Toast.makeText(this, "Los cambios se han realizado con éxito", Toast.LENGTH_SHORT).show();
         finish();
     }
 
@@ -428,14 +584,21 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            Log.v("ELIMINANDO INCIDENTE 1", "" + listaIncidente.size());
-            listaIncidente.remove(index);
-            Log.v("ELIMINANDO INCIDENTE 2", "" + listaIncidente.size());
+            listaIncidenteConsultasBackup.clear();
+            listaIncidenteConsultasBackup.addAll(listaIncidenteCompleta);
+            Collections.sort(listaIncidenteConsultasBackup, new Comparator<Incidente>() {
+                @Override
+                public int compare(Incidente o1, Incidente o2) {
+                    return Long.valueOf(o1.getFechaYHoraDelReporte()).compareTo(o2.getFechaYHoraDelReporte());
+                }
+            });
 
             st_lista_incidentes = "";
-            for (Incidente item : listaIncidente) {
-                st_lista_incidentes += item.aTag() + "¦";
+
+            for (Incidente i : listaIncidenteConsultasBackup) {
+                if (i.getFolioDelReporte() != incidente.getFolioDelReporte()) {
+                    st_lista_incidentes += i.aTag() + "¦";
+                }
             }
 
             data = "";
@@ -489,8 +652,6 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
             super.onPostExecute(aVoid);
             if (data.contains("error code: ") || !registroCorrecto) {
                 Snackbar.make(findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
-                listaIncidente.clear();
-                listaIncidente.addAll(listaIncidentesBackup);
             } else {
                 SharedPreferences prefs = getSharedPreferences("SERVICE_DESK_CUCSH_PREFERENCES", Context.MODE_PRIVATE);
                 prefs.edit().putString("LISTA_DE_INCIDENTES", st_lista_incidentes).apply();
@@ -507,16 +668,53 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            incidente.setComentarioTecnico(mensaje_tecnico);
-            incidente.setStatusDeModificacionDelReporte(1);
-            incidente.setStatusDeTerminacionDelReporte(nivel_progreso);
-            incidente.setTagDelReporte(incidente.aTag());
+            Incidente incidenteNuevo = new Incidente(
+                    incidente.getCodigoDelCliente(), // CODIGO DEL CLIENTE
+                    incidente.getNombreDelCliente(), // NOMBRE DEL CLIENTE
+                    incidente.getDependenciaDelCliente(), // DEPENDENCIA DEL CLIENTE
+                    incidente.getUbicacionDelCliente(), // UBICACION DEL CLIENTE
+                    incidente.getTelefonoDelCliente(), // TELEFONO DEL CLIENTE
+                    incidente.getCorreoElectronicoDelCliente(), // CORREO DEL CLIENTE
 
-            listaIncidente.set(index, incidente);
+                    incidente.getAreaDelServicio(), // AREA DEL SERVICIO
+                    incidente.getTipoDeServicio(), // TIPO DEL SERVICIO
+                    incidente.getPrioridadDelServicio(), // PRIPRIDAD DEL SERVICIO
+                    incidente.getDescripcionDelReporte(), // DESCRIPCION DEL SERVICIO
 
+                    Calendar.getInstance().getTimeInMillis(), // FECHA Y HORA DEL SERVICIO
+                    nivel_progreso, // STATUS DE TERMINACION DEL SERVICIO
+                    incidente.getFolioDelReporte(), // FOLIO DEL SERVICIO
+
+                    incidente.getCodigoDelTecnicoAsignado(), // CODIGO DEL TECNICO ASIGNADO
+                    tec.getCodigoDelTecnico(), // CODIGO DE QUIEN LEVANTO EL REPORTE
+                    1, // STATUS DE MODIFICACION DEL SERVICIO
+                    "", // TAG DEL REPORTE
+                    mensaje_tecnico
+            );
+            incidenteNuevo.setTagDelReporte(incidenteNuevo.aTag());
+
+            listaIncidenteConsultasBackup.clear();
+            listaIncidenteConsultasBackup.addAll(listaIncidenteCompleta);
+
+            int x = 0;
+            for (Incidente in : listaIncidenteConsultasBackup) {
+                if (in.getFolioDelReporte() == incidente.getFolioDelReporte()) {
+                    listaIncidenteConsultasBackup.remove(x);
+                    break;
+                }
+                x++;
+            }
+            listaIncidenteConsultasBackup.add(0, incidenteNuevo);
+
+            Collections.sort(listaIncidenteConsultasBackup, new Comparator<Incidente>() {
+                @Override
+                public int compare(Incidente o1, Incidente o2) {
+                    return Long.valueOf(o1.getFechaYHoraDelReporte()).compareTo(o2.getFechaYHoraDelReporte());
+                }
+            });
 
             st_lista_incidentes = "";
-            for (Incidente item : listaIncidente) {
+            for (Incidente item : listaIncidenteConsultasBackup) {
                 st_lista_incidentes += item.aTag() + "¦";
             }
 
@@ -571,15 +769,12 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
             super.onPostExecute(aVoid);
             if (data.contains("error code: ") || !registroCorrecto) {
                 Snackbar.make(findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
-                listaIncidente.clear();
-                listaIncidente.addAll(listaIncidentesBackup);
             } else {
                 SharedPreferences prefs = getSharedPreferences("SERVICE_DESK_CUCSH_PREFERENCES", Context.MODE_PRIVATE);
                 prefs.edit().putString("LISTA_DE_INCIDENTES", st_lista_incidentes).apply();
 
                 isEditanto = true;
                 new GuardarUpdate().execute();
-
             }
         }
     }
@@ -650,12 +845,7 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
                     cambiarLabelMensajeTecnico();
                     tvProgreso.animateText(crearTextoProgreso(nivel_progreso));
                     tvMensajeTecnico.setVisibility(View.VISIBLE);
-                    tvMensajeTecnico.animateText(incidente.getComentarioTecnico());
-
-                    Intent intent = getIntent();
-                    intent.putExtra("INDEX", index);
-                    intent.putExtra("EDITANDO", true);
-                    setResult(RESULT_OK, intent);
+                    tvMensajeTecnico.animateText(mensaje_tecnico);
                 } else {
                     confirmarEventoEliminado();
                 }
@@ -668,7 +858,9 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == EDITAR_EVENTO && resultCode == RESULT_OK) {
             index = data.getIntExtra("INDEX", 0);
-            final Incidente incidenteEditado = listaIncidente.get(index);
+            final Incidente incidenteEditado = data.getParcelableExtra("INCI");
+            Log.v("RESULT 1", incidenteEditado.aTag());
+            Log.v("RESULT 2", incidente.aTag());
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -732,7 +924,8 @@ public class ActivityDetalleIncidente extends AppCompatActivity {
                     }
 
                     if (!incidenteEditado.getDescripcionDelReporte().equals(incidente.getDescripcionDelReporte())) {
-                        tvDescripcion.animateText(incidenteEditado.getDescripcionDelReporte());
+                        tvDescripcion.animateText(incidenteEditado.getDescripcionDelReporte().replaceAll("Editado por:", "\n\nEditado por:")
+                                .replaceAll("~~", "\n"));
                     }
 
                     incidente = incidenteEditado;

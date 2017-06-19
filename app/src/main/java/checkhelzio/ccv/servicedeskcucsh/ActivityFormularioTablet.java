@@ -42,6 +42,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -49,7 +50,6 @@ import javax.net.ssl.HttpsURLConnection;
 import checkhelzio.ccv.servicedeskcucsh.HTextView.ScaleTextView;
 
 import static checkhelzio.ccv.servicedeskcucsh.ActivityMenuPrincipal.listaIncidenteCompleta;
-import static checkhelzio.ccv.servicedeskcucsh.ActivityMenuPrincipal.listaIncidenteConsulta;
 
 
 public class ActivityFormularioTablet extends AppCompatActivity {
@@ -221,7 +221,7 @@ public class ActivityFormularioTablet extends AppCompatActivity {
         input_descripcion_del_problema = (TextInputLayout) findViewById(R.id.input_descripcion_del_problema);
         et_descripcion_del_problema = (EditText) findViewById(R.id.et_descripcion_del_problema);
         et_descripcion_del_problema.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        et_descripcion_del_problema.setRawInputType(InputType.TYPE_CLASS_TEXT);
+        et_descripcion_del_problema.setRawInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
 
         final String[] areas = {"Redes y Telefonía", "Taller de cómputo", "Multimedia", "Administrativa"};
         final List<String> listaProblemas = new ArrayList<>();
@@ -329,11 +329,9 @@ public class ActivityFormularioTablet extends AppCompatActivity {
             et_telefono.setText(incidente.getTelefonoDelCliente());
             et_correo.setText(incidente.getCorreoElectronicoDelCliente());
 
-            et_descripcion_del_problema.setText(incidente.getDescripcionDelReporte());
             sp_areas.setSelection(incidente.getAreaDelServicio());
             sp_areas.setEnabled(false);
             sp_incidente.setSelection(incidente.getTipoDeServicio());
-            sp_incidente.setEnabled(false);
             switch (incidente.getPrioridadDelServicio()) {
                 case 1:
                     radio_baja.setChecked(true);
@@ -373,6 +371,9 @@ public class ActivityFormularioTablet extends AppCompatActivity {
             listaIncidenteConsultasBackup.clear();
             listaIncidenteConsultasBackup.addAll(listaIncidenteCompleta);
 
+            SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+            SimpleDateFormat formatHora = new SimpleDateFormat("h:mm a", Locale.getDefault());
+
             Incidente i = new Incidente(
                     // CODIGO DEL CLIENTE
                     et_codigo.getText().toString().trim(),
@@ -393,11 +394,18 @@ public class ActivityFormularioTablet extends AppCompatActivity {
                     // PRIRIDAD DEL INCIDENTE
                     getPrioridad(),
                     // DESCRIPCION DEL INCIDENTE
-                    et_descripcion_del_problema.getText().toString(),
+                    isEditMode ?
+                            incidente.getDescripcionDelReporte() +
+                                    "Editado por: " +
+                                    ActivityMenuPrincipal.tecnico.getNombreDelTecnico() +
+                                    "  -  " + format.format(Calendar.getInstance().getTime()) +
+                                    " a las " + formatHora.format(Calendar.getInstance().getTime())
+                                    + "~~" + et_descripcion_del_problema.getText().toString()
+                            : et_descripcion_del_problema.getText().toString(),
                     // HORA Y FECHA DEL LEVANTAMIENTO DEL INCIDENTE
                     Calendar.getInstance().getTimeInMillis(),
                     // STATUS DE TERMINACION DEL REPORTE
-                    0, // ASIGNADO
+                    isEditMode ? incidente.getStatusDeTerminacionDelReporte() : 0, // ASIGNADO
                     // FOLIO DEL INCIDENTE
                     isEditMode ? incidente.getFolioDelReporte() : ActivityMenuPrincipal.numeroFolioSiguiente,
                     // CODIGO DEL TECNICO ASIGNADO PARA LA SOLUCION DEL INSIDENTE
@@ -414,8 +422,8 @@ public class ActivityFormularioTablet extends AppCompatActivity {
 
             if (isEditMode) {
                 int x = 0;
-                for (Incidente in : listaIncidenteConsultasBackup){
-                    if (in.getFolioDelReporte() == incidente.getFolioDelReporte()){
+                for (Incidente in : listaIncidenteConsultasBackup) {
+                    if (in.getFolioDelReporte() == incidente.getFolioDelReporte()) {
                         listaIncidenteConsultasBackup.remove(x);
                         break;
                     }
@@ -488,14 +496,10 @@ public class ActivityFormularioTablet extends AppCompatActivity {
             if (data.contains("error code: ") || !registroCorrecto) {
                 Snackbar.make(findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
                 bt_guardar.setEnabled(true);
-                listaIncidenteConsulta.clear();
-                listaIncidenteConsulta.addAll(listaIncidenteConsultasBackup);
             } else {
                 SharedPreferences prefs = getSharedPreferences("SERVICE_DESK_CUCSH_PREFERENCES", Context.MODE_PRIVATE);
                 prefs.edit().putString("LISTA_DE_INCIDENTES", st_lista_incidentes).apply();
-
                 new GuardarUpdate().execute();
-
             }
         }
     }
@@ -656,26 +660,11 @@ public class ActivityFormularioTablet extends AppCompatActivity {
             if (data.contains("error code: ")) {
                 Snackbar.make(findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
                 bt_guardar.setEnabled(true);
-                listaIncidenteConsulta.clear();
-                listaIncidenteConsulta.addAll(listaIncidenteConsultasBackup);
             } else {
-                if (isEditMode) {
-                    editarIncidenteListo();
-                } else {
-                    registroListo();
-                }
+                Toast.makeText(ActivityFormularioTablet.this, "Los cambios se han realizado con éxito (Editar)", Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
-    }
-
-    private void editarIncidenteListo() {
-        Toast.makeText(ActivityFormularioTablet.this, "Los cambios se han realizado con éxito (Editar)", Toast.LENGTH_SHORT).show();
-        finish();
-    }
-
-    private void registroListo() {
-        Toast.makeText(ActivityFormularioTablet.this, "Los cambios se han realizado con éxito (Registrar)", Toast.LENGTH_SHORT).show();
-        finish();
     }
 
     private int getPrioridad() {

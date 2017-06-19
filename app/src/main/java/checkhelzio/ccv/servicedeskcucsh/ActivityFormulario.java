@@ -85,8 +85,6 @@ public class ActivityFormulario extends AppCompatActivity implements ViewPager.O
 
     @Override
     public void registroListo() {
-        Log.v("REGISTRO LISTO", "REGISTRO LISTO");
-        Log.v("INTENT", getCallingActivity().getClassName());
         Intent intent = getIntent();
         setResult(RESULT_OK, intent);
         finish();
@@ -99,11 +97,6 @@ public class ActivityFormulario extends AppCompatActivity implements ViewPager.O
 
     @Override
     public void editarIncidenteListo() {
-        Log.v("EDITAR INCIDENTE LISTO", "EDITAR INCIDENTE LISTO");
-        Log.v("INTENT", getCallingActivity().getClassName());
-        Intent intent = getIntent();
-        intent.putExtra("INDEX", getIntent().getIntExtra("INDEX", 0));
-        setResult(RESULT_OK, intent);
         finish();
     }
 }

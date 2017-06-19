@@ -14,7 +14,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,9 +34,9 @@ import java.util.ArrayList;
 public class ActivityMenuPrincipal extends AppCompatActivity {
 
     private ArrayList<Incidente> listaIncidenteExtras;
+    private ArrayList<Incidente> listaIncidenteEliminados;
     public static ArrayList<Incidente> listaIncidenteConsulta;
     public static ArrayList<Incidente> listaIncidenteCompleta;
-    public static ArrayList<Incidente> listaIncidenteEliminados;
     private Animation fadeIn, fadeOut;
     private FloatingActionButton fab_mas;
     private FragmentListaIncidentes fragmentListaIncidentes;
@@ -58,7 +57,6 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v("ActivityMenuPrincipal", "ON CREATE");
         setContentView(R.layout.activity_principal);
         if ((getResources().getConfiguration().screenLayout &
                 Configuration.SCREENLAYOUT_SIZE_MASK) ==
@@ -71,7 +69,6 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
 
     private void iniciarObjetos() {
 
-        Log.v("ActivityMenuPrincipal", "INICIAR OBJETOS");
         // SET TOOLBAR
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
         getSupportActionBar().setTitle("");
@@ -131,7 +128,7 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
             }
         });
 
-        if (nivel_usuario == 1){
+        if (nivel_usuario == 1) {
             fab_mas.setVisibility(View.GONE);
         }
 
@@ -146,7 +143,7 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.v("ActivityMenuPrincipal", "ON START");
+        isFinish = false;
         new LlenarLista().execute();
         comprobarActualizaciones();
     }
@@ -169,13 +166,12 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
     }
 
     private void comprobarActualizaciones() {
-        if (isFinish){
+        if (isFinish) {
             return;
         }
         if (isThereNetworkConnection()) {
             new DescargarUD().execute("http://148.202.6.72/aplicacion/update_incidentes.txt");
         } else {
-            new LlenarLista().execute();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -233,7 +229,6 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
                     }
                 }, 1000);
             }
-
         }
     }
 
@@ -330,7 +325,6 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
                     }
 
                     if (isFirstCharge) {
-                        Log.v("ActivityMenuPrincipal", "PRIMERA CARGA");
 
                         Incidente i = new Incidente(
                                 s.split("::")[0], // CODIGO DEL CLIENTE
@@ -362,7 +356,6 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
                             listaIncidenteExtras.add(i);
                         }
                     } else {
-                        Log.v("ActivityMenuPrincipal", "SEGUNDA CARGA");
 
                         // MODIFICAMOS PRIMERO LA LISTA COMPLETA
                         // SI LA HORA DE MODIFICACION DEL INCIDENTE NO ESTA EN LA LISTA ANTERIOR QUIERE DECIR QUE ES UNO NUEVO O UNO MODIFICADO
@@ -396,12 +389,10 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
 
                             // SI EL FOLIO DEL INCIDENTE NO APARECE EN LA LISTA VIEJA QUIERE DECIR QUE ES UN NUEVO INCIDENTE Y LO AGREGAMOS DIRECTAMENTE
                             if (!st_lista_incidentes_original.contains("::" + s.split("::")[12] + "::")) {
-                                Log.v("ActivityMenuPrincipal", "FOLIO NUEVO");
                                 listaIncidenteCompleta.add(0, i);
 
                             } else {
                                 // SI EL NUMERO DE FOLIO YA EXITE LO BUSCAMOS PARA EDITARLO.
-                                Log.v("ActivityMenuPrincipal", "FOLIO YA EXISTE");
                                 int x = 0;
                                 for (Incidente incidente : listaIncidenteCompleta) {
                                     if (incidente.aTag().contains("::" + s.split("::")[12] + "::")) {
@@ -422,7 +413,6 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
                             // SI LA HORA DE MODIFICACION DEL INCIDENTE NO ESTA EN LA LISTA ANTERIOR QUIERE DECIR QUE ES UNO NUEVO O UNO MODIFICADO
                             if (!st_lista_incidentes_original.contains(s.split("::")[10])) {
 
-                                Log.v("ActivityMenuPrincipal", "INCIDENTE NUEVO O MODIFICADO");
                                 // CREAMOS EL NUEVO INCIDENTE
                                 Incidente i = new Incidente(
                                         s.split("::")[0], // CODIGO DEL CLIENTE
@@ -451,11 +441,8 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
 
                                 // SI EL FOLIO DEL INCIDENTE NO APARECE EN LA LISTA VIEJA QUIERE DECIR QUE ES UN NUEVO INCIDENTE Y LO AGREGAMOS DIRECTAMENTE
                                 if (!st_lista_incidentes_original.contains("::" + s.split("::")[12] + "::")) {
-                                    Log.v("ActivityMenuPrincipal", "FOLIO NUEVO");
                                     listaIncidenteExtras.add(0, i);
                                 } else {
-                                    Log.v("ActivityMenuPrincipal", "ESTE FOLIO YA ESXISTE");
-                                    Log.v("ActivityMenuPrincipal", i.aTag());
                                     //EDITAR EVENTO
                                     listaIncidenteExtras.add(0, i);
                                 }
@@ -476,7 +463,6 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
                 for (Incidente i : listaIncidenteConsulta) {
                     if (!st_lista_incidentes.contains("" + i.getFechaYHoraDelReporte())) {
 
-                        Log.v("ST LISTA", "ESTE EVENTO YA NO EXISTE: " + i.aTag());
                         listaIncidenteEliminados.add(i);
                     }
                 }
@@ -492,14 +478,12 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            Log.v("ActivityMenuPrincipal", "LLENAR LISTA - POST EXECUTE");
             st_lista_incidentes_original = st_lista_incidentes;
 
             for (Incidente i : listaIncidenteEliminados) {
                 fragmentListaIncidentes.buscarItemParaEliminar(i.getFolioDelReporte());
             }
 
-            Log.v("LISTA", "TAMAÑO: " + listaIncidenteExtras.size());
 
             for (Incidente incidenteNuevo : listaIncidenteExtras) {
                 if (listaIncidenteConsulta.size() > 0) {
@@ -509,8 +493,8 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
                             listaIncidenteConsulta.add(x, incidenteNuevo);
                             fragmentListaIncidentes.agregarIncidenteaLista(x);
                             break;
-                        }else {
-                            if (x == listaIncidenteConsulta.size() - 1){
+                        } else {
+                            if (x == listaIncidenteConsulta.size() - 1) {
                                 listaIncidenteConsulta.add(incidenteNuevo);
                                 fragmentListaIncidentes.agregarIncidenteaLista(listaIncidenteConsulta.size() - 1);
                                 break;
@@ -527,9 +511,6 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
             fragmentListaIncidentes.notoficarCambios();
             actualizarEmptySate();
 
-            for (Incidente i : listaIncidenteConsulta) {
-                Log.v("ST LISTA", "C: " + i.aTag());
-            }
         }
     }
 
@@ -574,7 +555,7 @@ public class ActivityMenuPrincipal extends AppCompatActivity {
 
     public void actualizarEmptySate() {
         if (listaIncidenteConsulta.size() == 0) {
-            if (nivel_usuario > 1){
+            if (nivel_usuario > 1) {
                 fab_mas.show();
             }
             if (((View) iv_empty.getParent()).getVisibility() == View.GONE) {

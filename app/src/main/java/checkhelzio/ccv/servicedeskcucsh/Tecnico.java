@@ -12,8 +12,8 @@ public class Tecnico {
         this.codigoDelTecnico = codigo;
         switch (codigo) {
             case "207509057": // ADMIN
-                this.nombreDelTecnico = "Check";
-                this.apellidosDelTecnico = "CCV Helzio";
+                this.nombreDelTecnico = "Caryel";
+                this.apellidosDelTecnico = "Méndez";
                 this.unidad = "UMI";
                 this.nivel = 2;
                 break;

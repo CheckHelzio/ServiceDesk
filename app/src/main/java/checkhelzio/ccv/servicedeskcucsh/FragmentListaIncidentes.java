@@ -44,8 +44,6 @@ public class FragmentListaIncidentes extends Fragment implements IncidenteAdapte
     private void iniciarObjetos() {
 
         // Iniciar objetos
-        Log.v("FragmentListIncidentes", "INICIAR OBJETOS");
-
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_incidentes);
         fab_mas = (FloatingActionButton) view.findViewById(R.id.fab_mas);
 

@@ -3,13 +3,14 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinador"
+    android:id="@+id/coordinador_tablet"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#424242">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar_detalle"
+        android:elevation="0dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#8E171A"
@@ -25,7 +26,7 @@
             <RelativeLayout
                 android:id="@+id/conte_folio"
                 android:layout_width="match_parent"
-                android:layout_height="128dp"
+                android:layout_height="120dp"
                 android:orientation="horizontal">
 
                 <View
@@ -50,9 +51,10 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
+                        android:layout_marginBottom="-6dp"
                         android:text="Folio 2845"
                         android:textColor="#fff"
-                        android:textSize="30sp"
+                        android:textSize="26sp"
                         android:textStyle="bold" />
 
                     <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
@@ -62,9 +64,19 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:textColor="#fff"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                         android:textStyle="bold"
                         tools:text="Técnico: Zyanya López Díaz" />
+
+                    <TextView
+                        android:id="@+id/tv_marca_agua"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        tools:text="Registrado por Elba - 31/05/2017 a las 8:54 PM"
+                        android:textColor="#fff"
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 
@@ -88,33 +100,44 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_width="match_parent"
-        android:background="#424242"
-        android:layout_height="match_parent">
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:onClick="editar"
+        android:src="@drawable/ic_edit"
+        android:visibility="gone"
+        app:layout_anchor="@id/appbar_detalle"
+        app:layout_anchorGravity="bottom|end" />
 
-        <android.support.v4.widget.NestedScrollView
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#424242"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <ScrollView
             android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <LinearLayout
-                android:layout_marginTop="17dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/separador1"
+                android:layout_marginTop="17dp"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="7dp"
+                    android:layout_marginTop="15dp"
                     android:orientation="horizontal">
 
                     <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="25"
                         android:orientation="vertical">
 
                         <ImageView
@@ -123,9 +146,9 @@
                             android:layout_marginBottom="16dp"
                             android:layout_marginStart="24dp"
                             android:layout_marginTop="16dp"
-                            android:tint="#fff"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/ic_codigo" />
+                            android:src="@drawable/ic_codigo"
+                            android:tint="#fff" />
 
                         <TextView
                             android:id="@+id/label_codigo"
@@ -145,7 +168,6 @@
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/label_codigo"
-                            android:layout_marginEnd="56dp"
                             android:layout_marginStart="72dp"
                             android:layout_marginTop="-4dp"
                             android:background="#00000000"
@@ -158,7 +180,7 @@
                     <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="37.5"
                         android:orientation="vertical">
 
                         <ImageView
@@ -167,9 +189,9 @@
                             android:layout_marginBottom="16dp"
                             android:layout_marginStart="24dp"
                             android:layout_marginTop="16dp"
-                            android:tint="#fff"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/ic_cerrar_sesion" />
+                            android:src="@drawable/ic_cerrar_sesion"
+                            android:tint="#fff" />
 
                         <TextView
                             android:id="@+id/label_nombre"
@@ -189,57 +211,6 @@
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/label_nombre"
-                            android:layout_marginEnd="56dp"
-                            android:layout_marginStart="72dp"
-                            android:layout_marginTop="-4dp"
-                            android:background="#00000000"
-                            android:gravity="top"
-                            android:textColor="#fff"
-                            android:textSize="18sp" />
-
-                    </RelativeLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:tint="#fff"
-                            android:layout_marginBottom="16dp"
-                            android:layout_marginStart="24dp"
-                            android:layout_marginTop="16dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_edificio" />
-
-                        <TextView
-                            android:id="@+id/label_dependencia"
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
-                            android:layout_marginTop="12dp"
-                            android:background="#00000000"
-                            android:maxLines="1"
-                            android:paddingEnd="56dp"
-                            android:paddingStart="72dp"
-                            android:text="Dependencia:"
-                            android:textColor="#fff"
-                            android:textSize="12sp" />
-
-                        <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
-                            android:id="@+id/tv_dependencia"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/label_dependencia"
-                            android:layout_marginEnd="56dp"
                             android:layout_marginStart="72dp"
                             android:layout_marginTop="-4dp"
                             android:background="#00000000"
@@ -252,58 +223,7 @@
                     <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginBottom="16dp"
-                            android:layout_marginStart="24dp"
-                            android:tint="#fff"
-                            android:layout_marginTop="16dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_location" />
-
-                        <TextView
-                            android:id="@+id/label_ubicacion"
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
-                            android:layout_marginTop="12dp"
-                            android:background="#00000000"
-                            android:maxLines="1"
-                            android:paddingEnd="56dp"
-                            android:paddingStart="72dp"
-                            android:text="Ubicacion:"
-                            android:textColor="#fff"
-                            android:textSize="12sp" />
-
-                        <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
-                            android:id="@+id/tv_ubicacion"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/label_ubicacion"
-                            android:layout_marginEnd="56dp"
-                            android:layout_marginStart="72dp"
-                            android:layout_marginTop="-4dp"
-                            android:background="#00000000"
-                            android:gravity="top"
-                            android:textColor="#fff"
-                            android:textSize="18sp" />
-
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="37.5"
                         android:orientation="vertical">
 
                         <ImageView
@@ -313,52 +233,8 @@
                             android:layout_marginStart="24dp"
                             android:layout_marginTop="16dp"
                             android:scaleType="centerCrop"
-                            android:tint="#fff"
-                            android:src="@drawable/ic_phone" />
-
-                        <TextView
-                            android:id="@+id/label_telefono"
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
-                            android:layout_marginTop="12dp"
-                            android:background="#00000000"
-                            android:maxLines="1"
-                            android:paddingEnd="56dp"
-                            android:paddingStart="72dp"
-                            android:text="Teléfono:"
-                            android:textColor="#fff"
-                            android:textSize="12sp" />
-
-                        <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
-                            android:id="@+id/tv_telefono"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/label_telefono"
-                            android:layout_marginEnd="56dp"
-                            android:layout_marginStart="72dp"
-                            android:layout_marginTop="-4dp"
-                            android:background="#00000000"
-                            android:gravity="top"
-                            android:textColor="#fff"
-                            android:textSize="18sp" />
-
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginBottom="16dp"
-                            android:layout_marginStart="24dp"
-                            android:tint="#fff"
-                            android:layout_marginTop="16dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_mail" />
+                            android:src="@drawable/ic_mail"
+                            android:tint="#fff" />
 
                         <TextView
                             android:id="@+id/label_correo"
@@ -378,7 +254,6 @@
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/label_correo"
-                            android:layout_marginEnd="56dp"
                             android:layout_marginStart="72dp"
                             android:layout_marginTop="-4dp"
                             android:background="#00000000"
@@ -387,6 +262,155 @@
                             android:textSize="18sp" />
 
                     </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="7dp"
+                    android:layout_marginTop="18dp"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="25"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginBottom="16dp"
+                            android:layout_marginStart="24dp"
+                            android:layout_marginTop="16dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_phone"
+                            android:tint="#fff" />
+
+                        <TextView
+                            android:id="@+id/label_telefono"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_marginTop="12dp"
+                            android:background="#00000000"
+                            android:maxLines="1"
+                            android:paddingEnd="56dp"
+                            android:paddingStart="72dp"
+                            android:text="Teléfono:"
+                            android:textColor="#fff"
+                            android:textSize="12sp" />
+
+                        <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                            android:id="@+id/tv_telefono"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/label_telefono"
+                            android:layout_marginStart="72dp"
+                            android:layout_marginTop="-4dp"
+                            android:background="#00000000"
+                            android:gravity="top"
+                            android:textColor="#fff"
+                            android:textSize="18sp" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="37.5"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginBottom="16dp"
+                            android:layout_marginStart="24dp"
+                            android:layout_marginTop="16dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_edificio"
+                            android:tint="#fff" />
+
+                        <TextView
+                            android:id="@+id/label_dependencia"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_marginTop="12dp"
+                            android:background="#00000000"
+                            android:maxLines="1"
+                            android:paddingEnd="56dp"
+                            android:paddingStart="72dp"
+                            android:text="Dependencia:"
+                            android:textColor="#fff"
+                            android:textSize="12sp" />
+
+                        <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                            android:id="@+id/tv_dependencia"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/label_dependencia"
+                            android:layout_marginStart="72dp"
+                            android:layout_marginTop="-4dp"
+                            android:background="#00000000"
+                            android:gravity="top"
+                            android:textColor="#fff"
+                            android:textSize="18sp" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="37.5"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginBottom="16dp"
+                            android:layout_marginStart="24dp"
+                            android:layout_marginTop="16dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_location"
+                            android:tint="#fff" />
+
+                        <TextView
+                            android:id="@+id/label_ubicacion"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_marginTop="12dp"
+                            android:background="#00000000"
+                            android:maxLines="1"
+                            android:paddingEnd="56dp"
+                            android:paddingStart="72dp"
+                            android:text="Ubicacion:"
+                            android:textColor="#fff"
+                            android:textSize="12sp" />
+
+                        <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                            android:id="@+id/tv_ubicacion"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/label_ubicacion"
+                            android:layout_marginStart="72dp"
+                            android:layout_marginTop="-4dp"
+                            android:background="#00000000"
+                            android:gravity="top"
+                            android:textColor="#fff"
+                            android:textSize="18sp" />
+
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="7dp"
+                    android:layout_marginTop="7dp"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
                 </LinearLayout>
 
                 <View
@@ -409,9 +433,9 @@
                         android:layout_marginBottom="14dp"
                         android:layout_marginStart="24dp"
                         android:layout_marginTop="14dp"
-                        android:tint="#fff"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_incidente" />
+                        android:src="@drawable/ic_incidente"
+                        android:tint="#fff" />
 
                     <TextView
                         android:id="@+id/label_incidente"
@@ -460,10 +484,10 @@
                         android:layout_height="24dp"
                         android:layout_marginBottom="15dp"
                         android:layout_marginStart="24dp"
-                        android:tint="#fff"
                         android:layout_marginTop="15dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_info" />
+                        android:src="@drawable/ic_info"
+                        android:tint="#fff" />
 
                     <TextView
                         android:id="@+id/label"
@@ -473,13 +497,13 @@
                         android:background="#00000000"
                         android:maxLines="1"
                         android:paddingEnd="56dp"
-                        android:tint="#fff"
                         android:paddingStart="72dp"
                         android:text="Descripción:"
                         android:textColor="#fff"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        android:tint="#fff" />
 
-                    <checkhelzio.ccv.servicedeskcucsh.HTextView.FadeTextView
+                    <TextView
                         android:id="@+id/tv_descripcion"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
@@ -516,7 +540,7 @@
                         android:layout_marginTop="16dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_progress"
-                        android:tint="#fff"/>
+                        android:tint="#fff" />
 
                     <TextView
                         android:id="@+id/label_progreso"
@@ -558,9 +582,9 @@
                         android:layout_marginBottom="16dp"
                         android:layout_marginStart="24dp"
                         android:layout_marginTop="16dp"
-                        android:tint="#fff"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_text" />
+                        android:src="@drawable/ic_text"
+                        android:tint="#fff" />
 
                     <TextView
                         android:id="@+id/tv_label_mensaje_tecnico"
@@ -571,7 +595,7 @@
                         android:maxLines="1"
                         android:paddingEnd="56dp"
                         android:paddingStart="72dp"
-                        android:text="Descripción:"
+                        android:text="Nota:"
                         android:textColor="#fff"
                         android:textSize="12sp" />
 
@@ -583,6 +607,7 @@
                         android:layout_marginEnd="196dp"
                         android:layout_marginStart="72dp"
                         android:layout_marginTop="-4dp"
+                        android:text="Este incidente no ha sido visto por el técnico"
                         android:background="#00000000"
                         android:gravity="top"
                         android:textColor="#fff"
@@ -592,47 +617,36 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="8dp" />
+                    android:layout_height="32dp" />
             </LinearLayout>
 
-        </android.support.v4.widget.NestedScrollView>
+        </ScrollView>
 
         <LinearLayout
-            android:padding="8dp"
-            android:gravity="end"
-            android:orientation="horizontal"
             android:id="@+id/botonera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentStart="true"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
             <Button
                 android:id="@+id/bt_editar"
                 style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
-                android:text="Editar"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Editar" />
 
             <Button
                 android:id="@+id/bt_eliminar"
                 style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
-                android:text="Eliminar"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Eliminar" />
 
         </LinearLayout>
     </RelativeLayout>
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:onClick="editar"
-        android:src="@drawable/ic_edit"
-        android:visibility="gone"
-        app:layout_anchor="@id/appbar_detalle"
-        app:layout_anchorGravity="bottom|end" />
 
 </android.support.design.widget.CoordinatorLayout>

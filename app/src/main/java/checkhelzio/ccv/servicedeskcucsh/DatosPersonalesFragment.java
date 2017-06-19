@@ -225,6 +225,11 @@ public class DatosPersonalesFragment extends Fragment {
         Incidente incidente = getActivity().getIntent().getParcelableExtra("INCIDENTE");
         if (incidente != null) {
             et_codigo.setText(incidente.getCodigoDelCliente());
+            et_nombre.setText(incidente.getNombreDelCliente());
+            et_dependencia.setText(incidente.getDependenciaDelCliente());
+            et_ubicacion.setText(incidente.getUbicacionDelCliente());
+            et_telefono.setText(incidente.getTelefonoDelCliente());
+            et_correo.setText(incidente.getCorreoElectronicoDelCliente());
         }
     }
 

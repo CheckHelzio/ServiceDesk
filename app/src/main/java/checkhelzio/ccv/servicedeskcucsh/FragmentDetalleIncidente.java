@@ -2,7 +2,6 @@ package checkhelzio.ccv.servicedeskcucsh;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,11 +14,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -61,8 +59,9 @@ public class FragmentDetalleIncidente extends Fragment {
 
     private Incidente incidente;
     private TextView tv_folio;
-    private FadeTextView tv_tecnico, tvNombre, tvDependencia, tvUbicacion, tvTelefono, tvCorreo, tvTipoIncidente, tvDescripcion, tvProgreso, tvMensajeTecnico;
+    private FadeTextView tv_tecnico, tvNombre, tvDependencia, tvUbicacion, tvTelefono, tvCorreo, tvTipoIncidente, tvProgreso, tvMensajeTecnico;
     private String st_lista_incidentes;
+    private TextView tvDescripcion;
     private String data;
     private boolean registroCorrecto;
     private boolean isEditanto = false;
@@ -83,7 +82,9 @@ public class FragmentDetalleIncidente extends Fragment {
     private FadeTextView tv_codigo;
     private Button bt_eliminar;
     private Button bt_editar;
+    private CoordinatorLayout coordinatorLayout;
     private boolean actualizandoStatus;
+    private TextView tvMarcaAgua;
 
     @Nullable
     @Override
@@ -108,7 +109,7 @@ public class FragmentDetalleIncidente extends Fragment {
     }
 
     private void iniciarObjetos() {
-
+        tvMarcaAgua = (TextView) view.findViewById(R.id.tv_marca_agua);
         bt_eliminar = (Button) view.findViewById(R.id.bt_eliminar);
         bt_editar = (Button) view.findViewById(R.id.bt_editar);
         fadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in);
@@ -122,10 +123,11 @@ public class FragmentDetalleIncidente extends Fragment {
         tvTelefono = (FadeTextView) view.findViewById(R.id.tv_telefono);
         tvCorreo = (FadeTextView) view.findViewById(R.id.tv_correo);
         tvTipoIncidente = (FadeTextView) view.findViewById(R.id.tv_incidente);
-        tvDescripcion = (FadeTextView) view.findViewById(R.id.tv_descripcion);
+        tvDescripcion = (TextView) view.findViewById(R.id.tv_descripcion);
         tvProgreso = (FadeTextView) view.findViewById(R.id.tv_progreso);
         tvMensajeTecnico = (FadeTextView) view.findViewById(R.id.tv_mensaje_tecnico);
         coordinador = view.findViewById(R.id.nestedScrollView);
+        coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinador_tablet);
         appBar = view.findViewById(R.id.appbar_detalle);
 
         // SET LISTENNERS
@@ -191,7 +193,7 @@ public class FragmentDetalleIncidente extends Fragment {
         }
     }
 
-    public void reveal(){
+    public void reveal() {
         coordinador.startAnimation(fadeOut);
         appBar.startAnimation(fadeOut);
     }
@@ -199,11 +201,20 @@ public class FragmentDetalleIncidente extends Fragment {
     public void llenarDatos() {
 
         incidente = ActivityMenuPrincipal.listaIncidenteConsulta.get(ActivityMenuPrincipal.listaIndex);
+        Calendar fecha = Calendar.getInstance();
+        fecha.setTimeInMillis(incidente.getFechaYHoraDelReporte());
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+        SimpleDateFormat formatHora = new SimpleDateFormat("h:mm a", Locale.getDefault());
+        String st_marca_agua = (incidente.getStatusDeModificacionDelReporte() == 0 ? "Registrado por: " : "Editado por: ") +
+                new Tecnico(incidente.getCodigoDeQuienLevandoElReporte()).getNombreDelTecnico() +
+                " - " + format.format(fecha.getTime()) +
+                " a las " + formatHora.format(fecha.getTime());
 
         String folio = "Folio " + String.format(Locale.getDefault(), "%03d", incidente.getFolioDelReporte());
         tecnico = "Técnico: " + new Tecnico(incidente.getCodigoDelTecnicoAsignado()).getNombreCompletoDelTecnico();
         tv_folio.setText(folio);
         tv_tecnico.setTextoInicial(tecnico);
+        tvMarcaAgua.setText(st_marca_agua);
 
         view.findViewById(R.id.appbar_detalle).setBackgroundColor(Color.parseColor(getFondoPrioridad(incidente.getPrioridadDelServicio())));
         tvNombre.setTextoInicial(incidente.getNombreDelCliente());
@@ -213,36 +224,21 @@ public class FragmentDetalleIncidente extends Fragment {
         tvTelefono.setTextoInicial(incidente.getTelefonoDelCliente());
         tvCorreo.setTextoInicial(incidente.getCorreoElectronicoDelCliente());
         tvTipoIncidente.setTextoInicial(crearTextoTipoIncidente(incidente));
-        tvDescripcion.setTextoInicial(incidente.getDescripcionDelReporte());
+        tvDescripcion.setText(incidente.getDescripcionDelReporte()
+                .replaceAll("Editado por:", "\n\nEditado por:")
+                .replaceAll("~~", "\n"));
         tvProgreso.setTextoInicial(crearTextoProgreso(incidente.getStatusDeTerminacionDelReporte()));
 
         nivel_progreso = incidente.getStatusDeTerminacionDelReporte();
+        cambiarLabelMensajeTecnico();
+        if (incidente.getStatusDeTerminacionDelReporte() == 0) {
+            tvMensajeTecnico.setTextoInicial("Este incidente no ha sido visto por el técnico");
+        }else {
+            tvMensajeTecnico.setTextoInicial(incidente.getComentarioTecnico().trim());
+        }
 
-        ViewTreeObserver vto = tvMensajeTecnico.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (incidente.getComentarioTecnico().trim().length() == 0 || incidente.getStatusDeTerminacionDelReporte() == 0) {
-                    tvMensajeTecnico.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    view.findViewById(R.id.conte_extra).setVisibility(View.GONE);
-                } else {
-                    cambiarLabelMensajeTecnico();
-                    tvMensajeTecnico.setTextoInicial(incidente.getComentarioTecnico().trim());
-                }
-            }
-        });
-
-        try {
-            if (incidente.getComentarioTecnico().trim().length() == 0 || incidente.getStatusDeTerminacionDelReporte() == 0) {
-                view.findViewById(R.id.conte_extra).setVisibility(View.GONE);
-            } else {
-                cambiarLabelMensajeTecnico();
-                tvMensajeTecnico.setTextoInicial(incidente.getComentarioTecnico().trim());
-            }
-        }catch (Exception ignored){}
-        
-        if (incidente.getStatusDeTerminacionDelReporte() == 0 && incidente.getCodigoDelTecnicoAsignado().equals(ActivityMenuPrincipal.tecnico.getCodigoDelTecnico())){
-            if (isThereNetworkConnection()){
+        if (incidente.getStatusDeTerminacionDelReporte() == 0 && incidente.getCodigoDelTecnicoAsignado().equals(ActivityMenuPrincipal.tecnico.getCodigoDelTecnico())) {
+            if (isThereNetworkConnection()) {
                 actualizarStatusAsigando();
             }
         }
@@ -256,7 +252,7 @@ public class FragmentDetalleIncidente extends Fragment {
     private void cambiarLabelMensajeTecnico() {
         switch (nivel_progreso) {
             case 1:
-                ((TextView) view.findViewById(R.id.tv_label_mensaje_tecnico)).setText("Nota del técnico:");
+                ((TextView) view.findViewById(R.id.tv_label_mensaje_tecnico)).setText("Nota:");
                 break;
             case 2:
                 ((TextView) view.findViewById(R.id.tv_label_mensaje_tecnico)).setText("¿Por qué?");
@@ -421,10 +417,10 @@ public class FragmentDetalleIncidente extends Fragment {
                     alertDialogBuilder.create().show();
                 }
             } else if (mobileConnected) {
-                Snackbar.make(view.findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet.", Snackbar.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet.", Toast.LENGTH_LONG).show();
             }
         } else {
-            Snackbar.make(view.findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet.", Snackbar.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -508,8 +504,8 @@ public class FragmentDetalleIncidente extends Fragment {
     public void comprobarExistencia() {
         int indice = 0;
         boolean estaEnLaLista = false;
-        for (Incidente i : listaIncidenteConsulta){
-            if (i.getFolioDelReporte() == incidente.getFolioDelReporte()){
+        for (Incidente i : listaIncidenteConsulta) {
+            if (i.getFolioDelReporte() == incidente.getFolioDelReporte()) {
                 listaIndex = indice;
                 estaEnLaLista = true;
                 break;
@@ -517,9 +513,9 @@ public class FragmentDetalleIncidente extends Fragment {
             indice++;
         }
 
-        if (estaEnLaLista){
+        if (estaEnLaLista) {
             actualizar(indice);
-        }else {
+        } else {
             listaIndex = 0;
             reveal();
         }
@@ -569,9 +565,6 @@ public class FragmentDetalleIncidente extends Fragment {
                     tvNombre.animateText(incidenteEditado.getNombreDelCliente());
                 }
 
-                Log.v("CODIGO 1", "CODIGO 1: " + incidente.getCodigoDelCliente());
-                Log.v("CODIGO 2", "CODIGO 2: " + incidenteEditado.getCodigoDelCliente());
-
                 if (!incidenteEditado.getCodigoDelCliente().equals(incidente.getCodigoDelCliente())) {
                     tv_codigo.animateText(incidenteEditado.getCodigoDelCliente());
                 }
@@ -598,8 +591,29 @@ public class FragmentDetalleIncidente extends Fragment {
                 }
 
                 if (!incidenteEditado.getDescripcionDelReporte().equals(incidente.getDescripcionDelReporte())) {
-                    tvDescripcion.animateText(incidenteEditado.getDescripcionDelReporte());
+                    cambiarLabelMensajeTecnico();
+                    tvDescripcion.setText(incidenteEditado.getDescripcionDelReporte()
+                            .replaceAll("Editado por:", "\n\nEditado por:")
+                            .replaceAll("~~", "\n"));
                 }
+
+
+                //MARCA DE AGUA
+                Calendar fecha = Calendar.getInstance();
+                fecha.setTimeInMillis(incidenteEditado.getFechaYHoraDelReporte());
+                SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+                SimpleDateFormat formatHora = new SimpleDateFormat("h:mm a", Locale.getDefault());
+                String st_marca_agua = (incidenteEditado.getStatusDeModificacionDelReporte() == 0 ? "Registrado por: " : "Editado por: ") +
+                        new Tecnico(incidenteEditado.getCodigoDeQuienLevandoElReporte()).getNombreDelTecnico() +
+                        " - " + format.format(fecha.getTime()) +
+                        " a las " + formatHora.format(fecha.getTime());
+                tvMarcaAgua.setText(st_marca_agua);
+
+                if (incidenteEditado.getStatusDeTerminacionDelReporte() != incidente.getStatusDeTerminacionDelReporte()){
+                    tvProgreso.animateText(crearTextoProgreso(incidenteEditado.getStatusDeTerminacionDelReporte()));
+                }
+
+                tvMensajeTecnico.animateText(incidenteEditado.getComentarioTecnico().trim());
 
                 incidente = incidenteEditado;
             }
@@ -612,7 +626,6 @@ public class FragmentDetalleIncidente extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Log.v("ELIMINAR", "ELIMINAR PRE");
             listaIncidenteConsultasBackup.clear();
             listaIncidenteConsultasBackup.addAll(listaIncidenteCompleta);
             Collections.sort(listaIncidenteConsultasBackup, new Comparator<Incidente>() {
@@ -624,8 +637,8 @@ public class FragmentDetalleIncidente extends Fragment {
 
             st_lista_incidentes = "";
 
-            for (Incidente i : listaIncidenteConsultasBackup){
-                if (i.getFolioDelReporte() != incidente.getFolioDelReporte()){
+            for (Incidente i : listaIncidenteConsultasBackup) {
+                if (i.getFolioDelReporte() != incidente.getFolioDelReporte()) {
                     st_lista_incidentes += i.aTag() + "¦";
                 }
             }
@@ -680,8 +693,7 @@ public class FragmentDetalleIncidente extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (data.contains("error code: ") || !registroCorrecto) {
-                Snackbar.make(view.findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
-                listaIncidenteConsultasBackup.clear();
+                Toast.makeText(getActivity(), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet.", Toast.LENGTH_LONG).show();
             } else {
                 SharedPreferences prefs = getActivity().getSharedPreferences("SERVICE_DESK_CUCSH_PREFERENCES", Context.MODE_PRIVATE);
                 prefs.edit().putString("LISTA_DE_INCIDENTES", st_lista_incidentes).apply();
@@ -699,6 +711,7 @@ public class FragmentDetalleIncidente extends Fragment {
             super.onPreExecute();
 
             actualizandoStatus = true;
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy h:mm a", Locale.getDefault());
 
             Incidente incidenteNuevo = new Incidente(
                     incidente.getCodigoDelCliente(), // CODIGO DEL CLIENTE
@@ -721,7 +734,7 @@ public class FragmentDetalleIncidente extends Fragment {
                     incidente.getCodigoDeQuienLevandoElReporte(), // CODIGO DE QUIEN LEVANTO EL REPORTE
                     incidente.getStatusDeModificacionDelReporte(), // STATUS DE MODIFICACION DEL SERVICIO
                     "", // TAG DEL REPORTE
-                    incidente.getComentarioTecnico()
+                    "Visto por el técnico - " + format.format(Calendar.getInstance().getTime())
             );
             incidenteNuevo.setTagDelReporte(incidenteNuevo.aTag());
 
@@ -729,8 +742,8 @@ public class FragmentDetalleIncidente extends Fragment {
             listaIncidenteConsultasBackup.addAll(listaIncidenteCompleta);
 
             int x = 0;
-            for (Incidente in : listaIncidenteConsultasBackup){
-                if (in.getFolioDelReporte() == incidente.getFolioDelReporte()){
+            for (Incidente in : listaIncidenteConsultasBackup) {
+                if (in.getFolioDelReporte() == incidente.getFolioDelReporte()) {
                     listaIncidenteConsultasBackup.remove(x);
                     break;
                 }
@@ -800,9 +813,7 @@ public class FragmentDetalleIncidente extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (data.contains("error code: ") || !registroCorrecto) {
-                Snackbar.make(view.findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
-                listaIncidenteConsulta.clear();
-                listaIncidenteConsulta.addAll(listaIncidenteConsultasBackup);
+                Toast.makeText(getActivity(), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet.", Toast.LENGTH_LONG).show();
             } else {
                 SharedPreferences prefs = getActivity().getSharedPreferences("SERVICE_DESK_CUCSH_PREFERENCES", Context.MODE_PRIVATE);
                 prefs.edit().putString("LISTA_DE_INCIDENTES", st_lista_incidentes).apply();
@@ -849,8 +860,8 @@ public class FragmentDetalleIncidente extends Fragment {
             listaIncidenteConsultasBackup.addAll(listaIncidenteCompleta);
 
             int x = 0;
-            for (Incidente in : listaIncidenteConsultasBackup){
-                if (in.getFolioDelReporte() == incidente.getFolioDelReporte()){
+            for (Incidente in : listaIncidenteConsultasBackup) {
+                if (in.getFolioDelReporte() == incidente.getFolioDelReporte()) {
                     listaIncidenteConsultasBackup.remove(x);
                     break;
                 }
@@ -920,16 +931,13 @@ public class FragmentDetalleIncidente extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (data.contains("error code: ") || !registroCorrecto) {
-                Snackbar.make(view.findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
-                listaIncidenteConsulta.clear();
-                listaIncidenteConsulta.addAll(listaIncidenteConsultasBackup);
+                Toast.makeText(getActivity(), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet.", Toast.LENGTH_LONG).show();
             } else {
                 SharedPreferences prefs = getActivity().getSharedPreferences("SERVICE_DESK_CUCSH_PREFERENCES", Context.MODE_PRIVATE);
                 prefs.edit().putString("LISTA_DE_INCIDENTES", st_lista_incidentes).apply();
 
                 isEditanto = true;
                 new GuardarUpdate().execute();
-
             }
         }
     }
@@ -993,10 +1001,9 @@ public class FragmentDetalleIncidente extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (data.contains("error code: ")) {
-                Snackbar.make(view.findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
-                Log.v("Error", "ERROR PASO 2");
+                Toast.makeText(getActivity(), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet.", Toast.LENGTH_LONG).show();
             } else {
-                if (!actualizandoStatus){
+                if (!actualizandoStatus) {
                     Toast.makeText(getActivity(), "Los cambios se han realizado con éxito", Toast.LENGTH_SHORT).show();
                 }
             }

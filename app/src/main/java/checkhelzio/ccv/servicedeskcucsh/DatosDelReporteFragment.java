@@ -1,6 +1,7 @@
 package checkhelzio.ccv.servicedeskcucsh;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
@@ -8,7 +9,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -38,14 +39,16 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import static checkhelzio.ccv.servicedeskcucsh.ActivityListaIncidentes.listaIncidente;
-import static checkhelzio.ccv.servicedeskcucsh.R.id.et_codigo;
-import static checkhelzio.ccv.servicedeskcucsh.R.id.tv_descripcion;
+import static android.app.Activity.RESULT_OK;
+import static checkhelzio.ccv.servicedeskcucsh.ActivityListaIncidentes.listaIncidenteCompleta;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -85,8 +88,8 @@ public class DatosDelReporteFragment extends Fragment {
     private View v;
     private boolean isEditMode = false;
 
-    private ArrayList<Incidente> listaIncidentesBackup = new ArrayList<>();
-    private Incidente incidente;
+    private ArrayList<Incidente> listaIncidenteConsultasBackup = new ArrayList<>();
+    private Incidente incidente, inn;
 
 
     public DatosDelReporteFragment() {
@@ -250,9 +253,9 @@ public class DatosDelReporteFragment extends Fragment {
         incidente = getActivity().getIntent().getParcelableExtra("INCIDENTE");
         if (incidente != null) {
             isEditMode = true;
-            et_descripcion_del_problema.setText(incidente.getDescripcionDelReporte());
             sp_areas.setSelection(incidente.getAreaDelServicio());
             sp_incidente.setSelection(incidente.getTipoDeServicio());
+            sp_areas.setEnabled(false);
             switch (incidente.getPrioridadDelServicio()) {
                 case 1:
                     radio_baja.setChecked(true);
@@ -265,15 +268,6 @@ public class DatosDelReporteFragment extends Fragment {
                     break;
             }
         }
-
-        listaIncidentesBackup.addAll(listaIncidente);
-    }
-
-    public void limpiarCampos() {
-        et_descripcion_del_problema.setText("");
-        sp_areas.setSelection(0);
-        sp_incidente.setSelection(0);
-        radio_baja.setChecked(true);
     }
 
     class GuardarEvento extends AsyncTask<String, String, Void> {
@@ -282,9 +276,13 @@ public class DatosDelReporteFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            Log.v("GUARDAR EVENTO", "PRE EXECUTE - TAMAÑO LISTA: " + listaIncidente.size());
+            listaIncidenteConsultasBackup.clear();
+            listaIncidenteConsultasBackup.addAll(listaIncidenteCompleta);
 
-            Incidente i = new Incidente(
+            SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+            SimpleDateFormat formatHora = new SimpleDateFormat("h:mm a", Locale.getDefault());
+
+            inn = new Incidente(
                     // CODIGO DEL CLIENTE
                     codigo,
                     // NOMBRE DEL CLIENTE
@@ -304,11 +302,18 @@ public class DatosDelReporteFragment extends Fragment {
                     // PRIRIDAD DEL INCIDENTE
                     getPrioridad(),
                     // DESCRIPCION DEL INCIDENTE
-                    et_descripcion_del_problema.getText().toString(),
+                    isEditMode ?
+                            incidente.getDescripcionDelReporte() +
+                                    "Editado por: " +
+                                    ActivityListaIncidentes.tecnico.getNombreDelTecnico() +
+                                    "  -  " + format.format(Calendar.getInstance().getTime()) +
+                                    " a las " + formatHora.format(Calendar.getInstance().getTime())
+                                    + "~~" + et_descripcion_del_problema.getText().toString()
+                            : et_descripcion_del_problema.getText().toString(),
                     // HORA Y FECHA DEL LEVANTAMIENTO DEL INCIDENTE
                     Calendar.getInstance().getTimeInMillis(),
                     // STATUS DE TERMINACION DEL REPORTE
-                    0, // ASIGNADO
+                    isEditMode ? incidente.getStatusDeTerminacionDelReporte() : 0, // ASIGNADO,
                     // FOLIO DEL INCIDENTE
                     isEditMode ? incidente.getFolioDelReporte() : ActivityListaIncidentes.numeroFolioSiguiente,
                     // CODIGO DEL TECNICO ASIGNADO PARA LA SOLUCION DEL INSIDENTE
@@ -319,20 +324,34 @@ public class DatosDelReporteFragment extends Fragment {
                     isEditMode ? 1 : 0,
                     // TAG PARA GUARDAR EN LINEA
                     "",
-                    "Sin comentarios adicionales" // COMENTARIO DEL TECNICO
+                    isEditMode ? incidente.getComentarioTecnico() : "Sin comentarios adicionales" // COMENTARIO DEL TECNICO
             );
-            i.setTagDelReporte(i.aTag());
+            inn.setTagDelReporte(inn.aTag());
 
             if (isEditMode) {
-                listaIncidente.set(getActivity().getIntent().getIntExtra("INDEX", 0), i);
-            } else {
-                listaIncidente.add(i);
+                int x = 0;
+                for (Incidente in : listaIncidenteConsultasBackup) {
+                    if (in.getFolioDelReporte() == incidente.getFolioDelReporte()) {
+                        listaIncidenteConsultasBackup.remove(x);
+                        break;
+                    }
+                    x++;
+                }
             }
+            listaIncidenteConsultasBackup.add(0, inn);
+
+            Collections.sort(listaIncidenteConsultasBackup, new Comparator<Incidente>() {
+                @Override
+                public int compare(Incidente o1, Incidente o2) {
+                    return Long.valueOf(o1.getFechaYHoraDelReporte()).compareTo(o2.getFechaYHoraDelReporte());
+                }
+            });
 
             st_lista_incidentes = "";
-            for (Incidente item : listaIncidente) {
+            for (Incidente item : listaIncidenteConsultasBackup) {
                 st_lista_incidentes += item.aTag() + "¦";
             }
+
             data = "";
             registroCorrecto = false;
         }
@@ -385,35 +404,31 @@ public class DatosDelReporteFragment extends Fragment {
             if (data.contains("error code: ") || !registroCorrecto) {
                 Snackbar.make(v.findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
                 bt_guardar.setEnabled(true);
-                listaIncidente.clear();
-                listaIncidente.addAll(listaIncidentesBackup);
             } else {
                 SharedPreferences prefs = getActivity().getSharedPreferences("SERVICE_DESK_CUCSH_PREFERENCES", Context.MODE_PRIVATE);
                 prefs.edit().putString("LISTA_DE_INCIDENTES", st_lista_incidentes).apply();
-
                 new GuardarUpdate().execute();
-
             }
         }
     }
 
     private String asignarTecnico() {
         Calendar calendar = Calendar.getInstance();
-        switch (sp_areas.getSelectedItemPosition()){
+        switch (sp_areas.getSelectedItemPosition()) {
             case 0:
-                if (calendar.get(Calendar.HOUR_OF_DAY) < 9){
+                if (calendar.get(Calendar.HOUR_OF_DAY) < 9) {
                     return new Tecnico("2957917").getCodigoDelTecnico();
-                }else if (calendar.get(Calendar.HOUR_OF_DAY) < 13){
-                    int random = randomInt(0,1);
-                    switch (random){
+                } else if (calendar.get(Calendar.HOUR_OF_DAY) < 13) {
+                    int random = randomInt(0, 1);
+                    switch (random) {
                         case 0:
                             return new Tecnico("2957917").getCodigoDelTecnico();
                         case 1:
                             return new Tecnico("2520761").getCodigoDelTecnico();
                     }
-                }else if (calendar.get(Calendar.HOUR_OF_DAY) < 16){
-                    int random = randomInt(0,2);
-                    switch (random){
+                } else if (calendar.get(Calendar.HOUR_OF_DAY) < 16) {
+                    int random = randomInt(0, 2);
+                    switch (random) {
                         case 0:
                             return new Tecnico("2957917").getCodigoDelTecnico();
                         case 1:
@@ -421,34 +436,34 @@ public class DatosDelReporteFragment extends Fragment {
                         case 2:
                             return new Tecnico("2954064").getCodigoDelTecnico();
                     }
-                }else if (calendar.get(Calendar.HOUR_OF_DAY) < 18){
-                    int random = randomInt(1,2);
-                    switch (random){
+                } else if (calendar.get(Calendar.HOUR_OF_DAY) < 18) {
+                    int random = randomInt(1, 2);
+                    switch (random) {
                         case 1:
                             return new Tecnico("2520761").getCodigoDelTecnico();
                         case 2:
                             return new Tecnico("2954064").getCodigoDelTecnico();
                     }
-                }else if (calendar.get(Calendar.HOUR_OF_DAY) < 19){
+                } else if (calendar.get(Calendar.HOUR_OF_DAY) < 19) {
                     return new Tecnico("2954064").getCodigoDelTecnico();
-                }else {
+                } else {
                     return new Tecnico("2957917").getCodigoDelTecnico();
                 }
                 break;
             case 1:
-                if (calendar.get(Calendar.HOUR_OF_DAY) < 10){
+                if (calendar.get(Calendar.HOUR_OF_DAY) < 10) {
                     return new Tecnico("9715371").getCodigoDelTecnico();
-                }else if (calendar.get(Calendar.HOUR_OF_DAY) < 14){
-                    int random = randomInt(0,1);
-                    switch (random){
+                } else if (calendar.get(Calendar.HOUR_OF_DAY) < 14) {
+                    int random = randomInt(0, 1);
+                    switch (random) {
                         case 0:
                             return new Tecnico("9715371").getCodigoDelTecnico();
                         case 1:
                             return new Tecnico("1234").getCodigoDelTecnico();
                     }
-                }else if (calendar.get(Calendar.HOUR_OF_DAY) < 16){
-                    int random = randomInt(0,2);
-                    switch (random){
+                } else if (calendar.get(Calendar.HOUR_OF_DAY) < 16) {
+                    int random = randomInt(0, 2);
+                    switch (random) {
                         case 0:
                             return new Tecnico("9715371").getCodigoDelTecnico();
                         case 1:
@@ -456,22 +471,22 @@ public class DatosDelReporteFragment extends Fragment {
                         case 2:
                             return new Tecnico("09537805").getCodigoDelTecnico();
                     }
-                }else if (calendar.get(Calendar.HOUR_OF_DAY) < 18){
-                    int random = randomInt(1,2);
-                    switch (random){
+                } else if (calendar.get(Calendar.HOUR_OF_DAY) < 18) {
+                    int random = randomInt(1, 2);
+                    switch (random) {
                         case 1:
                             return new Tecnico("1234").getCodigoDelTecnico();
                         case 2:
                             return new Tecnico("09537805").getCodigoDelTecnico();
                     }
-                }else if (calendar.get(Calendar.HOUR_OF_DAY) < 19){
+                } else if (calendar.get(Calendar.HOUR_OF_DAY) < 19) {
                     return new Tecnico("09537805").getCodigoDelTecnico();
-                }else {
+                } else {
                     return new Tecnico("9715371").getCodigoDelTecnico();
                 }
                 break;
             case 2:
-                switch (sp_incidente.getSelectedItemPosition()){
+                switch (sp_incidente.getSelectedItemPosition()) {
                     case 0:
                         return new Tecnico("01290713").getCodigoDelTecnico(); // ZYANYA
                     case 1:
@@ -483,27 +498,27 @@ public class DatosDelReporteFragment extends Fragment {
                     case 4:
                         return new Tecnico("005107962").getCodigoDelTecnico(); // HIRAM
                     case 5:
-                        if (calendar.get(Calendar.HOUR_OF_DAY) < 16){
+                        if (calendar.get(Calendar.HOUR_OF_DAY) < 16) {
                             return new Tecnico("2946467").getCodigoDelTecnico(); // LALO
-                        }else {
+                        } else {
                             return new Tecnico("2952470").getCodigoDelTecnico(); // EMMANUEL
                         }
                     case 6:
-                        if (calendar.get(Calendar.HOUR_OF_DAY) < 16){
+                        if (calendar.get(Calendar.HOUR_OF_DAY) < 16) {
                             return new Tecnico("2946467").getCodigoDelTecnico(); // LALO
-                        }else {
+                        } else {
                             return new Tecnico("2952470").getCodigoDelTecnico(); // EMMANUEL
                         }
                     case 7:
-                        if (calendar.get(Calendar.HOUR_OF_DAY) < 16){
+                        if (calendar.get(Calendar.HOUR_OF_DAY) < 16) {
                             return new Tecnico("2946467").getCodigoDelTecnico(); // LALO
-                        }else {
+                        } else {
                             return new Tecnico("2952470").getCodigoDelTecnico(); // EMMANUEL
                         }
                 }
                 break;
             case 3:
-                switch (sp_incidente.getSelectedItemPosition()){
+                switch (sp_incidente.getSelectedItemPosition()) {
                     case 0:
                         return new Tecnico("2528894").getCodigoDelTecnico(); // HECTOR
                     case 1:
@@ -680,10 +695,12 @@ public class DatosDelReporteFragment extends Fragment {
             if (data.contains("error code: ")) {
                 Snackbar.make(v.findViewById(R.id.coordinador), "Hay un problema con la conexión a la base de datos. Verifica tu conexión a internet e intentalo nuevamente.", Snackbar.LENGTH_LONG).show();
                 bt_guardar.setEnabled(true);
-                listaIncidente.clear();
-                listaIncidente.addAll(listaIncidentesBackup);
             } else {
+                Toast.makeText(getActivity(), "Los cambios se han realizado con éxito", Toast.LENGTH_SHORT).show();
                 if (isEditMode) {
+                    Intent intent = getActivity().getIntent();
+                    intent.putExtra("INCI", inn);
+                    getActivity().setResult(RESULT_OK, intent);
                     mEditarIncidenteListoListenner.editarIncidenteListo();
                 } else {
                     mRegistroListoListener.registroListo();
